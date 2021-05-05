@@ -1,0 +1,2 @@
+# multiple_select_checkbox
+基于elementUI封装的带复选框el-checkbox的下拉多选el-select组件
