@@ -1,17 +1,44 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <MultipleSelect v-model="value" :options="options" :popper-append-to-body="false"></MultipleSelect>
+    <el-button @click="confirm">确定</el-button>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import MultipleSelect from "./components/MultipleSelect"
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    MultipleSelect
+  },
+  data() {
+    return {
+      value: [],
+      options: [
+        {
+          value: '选项1',
+          label: '黄金糕'
+        }, {
+          value: '选项2',
+          label: '双皮奶'
+        }, {
+          value: '选项3',
+          label: '蚵仔煎'
+        }, {
+          value: '选项4',
+          label: '龙须面'
+        }, {
+          value: '选项5',
+          label: '北京烤鸭'
+        }
+      ]
+    }
+  },
+  methods: {
+    confirm() {
+      console.log("value", this.value)
+    }
   }
 }
 </script>
