@@ -52,6 +52,7 @@ export default {
       isSelectAll: false,
       styleText: {
         "--text-width": this.textWidth + "px",
+        "--text-max-width": "100px",
       }
     }
   },
@@ -66,9 +67,7 @@ export default {
     const elSelectDropdown = this.$el.querySelector(".el-select-dropdown")
     const multipleSelectCheckboxMaxWidth = this.$el.scrollWidth
     elSelectDropdown.style["max-width"] = multipleSelectCheckboxMaxWidth + "px"
-    if (!this.textWidth) {
-      this.styleText["--text-width"] = multipleSelectCheckboxMaxWidth - 80 + "px"
-    }
+    this.styleText["--text-max-width"] = multipleSelectCheckboxMaxWidth - 80 + "px"
   },
   watch: {
     // 监听（全选or全不选）
@@ -108,7 +107,8 @@ export default {
 
 <style scoped>
 .multiple_select_checkbox >>> .el-select-dropdown .el-checkbox.el-tooltip .el-checkbox__label {
-  max-width: var(--text-width);
+  width: var(--text-width);
+  max-width: var(--text-max-width);
   vertical-align: middle;
   overflow: hidden;
   text-overflow: ellipsis;
