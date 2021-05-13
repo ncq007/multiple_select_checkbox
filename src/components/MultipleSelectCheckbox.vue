@@ -1,6 +1,6 @@
 <template>
-  <el-select v-model="selectValues" v-bind="$attrs" multiple class="multiple_select_checkbox" :class="isSetInlineBlock" :style="styleText"
-             @visible-change="visibleChange" @change="changeSelect">
+  <el-select v-model="selectValues" :popper-class="'multiple_select_popper_' + order" v-bind="$attrs" multiple
+             :class="'multiple_select_checkbox_' + order" :style="styleText" @visible-change="visibleChange" @change="changeSelect">
     <el-option v-if="options.length" label="全选" value="全选">
       <el-checkbox v-model="isSelectAll" @click.native.prevent>全选</el-checkbox>
     </el-option>
@@ -44,6 +44,10 @@ export default {
     // 选项的宽度
     textWidth: {
       type: Number,
+    },
+    order: {
+      type: Number,
+      default: 0
     }
   },
   data() {
@@ -51,9 +55,11 @@ export default {
       selectValues: [],
       isSelectAll: false,
       styleText: {
-        "--text-width": this.textWidth + "px",
-        "--text-max-width": "100px",
-      }
+        "text-width": this.textWidth,
+        "text-max-width": 100,
+        "display": this.isInline ? "block" : "inline-block"
+      },
+      multipleSelectCheckboxMaxWidth: 0
     }
   },
   computed: {
@@ -64,10 +70,11 @@ export default {
     }
   },
   mounted() {
-    const elSelectDropdown = this.$el.querySelector(".el-select-dropdown")
-    const multipleSelectCheckboxMaxWidth = this.$el.scrollWidth
+    const multipleSelectCheckbox = document.querySelector(`.multiple_select_checkbox_${this.order}.el-select`)
+    const elSelectDropdown = document.querySelector(`.multiple_select_popper_${this.order}.el-select-dropdown`)
+    const multipleSelectCheckboxMaxWidth = multipleSelectCheckbox.scrollWidth
+    this.multipleSelectCheckboxMaxWidth = multipleSelectCheckboxMaxWidth
     elSelectDropdown.style["max-width"] = multipleSelectCheckboxMaxWidth + "px"
-    this.styleText["--text-max-width"] = multipleSelectCheckboxMaxWidth - 80 + "px"
   },
   watch: {
     // 监听（全选or全不选）
@@ -80,8 +87,6 @@ export default {
   },
   methods: {
     changeSelect(val) {
-      // eslint-disable-next-line no-debugger
-      debugger
       if (val.includes("全选")) {
         // 说明已经全选了，所以全不选
         if (val.length > this.options.length) {
@@ -98,9 +103,23 @@ export default {
     async visibleChange(visible) {
       await this.$nextTick()
       if (visible) {
-        const els = this.$el.querySelectorAll(".el-select-dropdown .el-checkbox.el-tooltip .el-checkbox__label")
-        els.forEach((el, index) => {
-          this.$set(this.options[index], "isExceed", el.scrollWidth > el.clientWidth)
+        const maxLableWidth = this.multipleSelectCheckboxMaxWidth - 80
+        const labels = document.querySelectorAll(`.multiple_select_popper_${this.order}.el-select-dropdown .el-checkbox.el-tooltip .el-checkbox__label`)
+        labels.forEach((label, index) => {
+          // eslint-disable-next-line no-prototype-builtins
+          if (!this.options[index].hasOwnProperty("isExceed")) {
+            this.$set(this.options[index], "isExceed", label.scrollWidth > (this.styleText["text-width"] || maxLableWidth))
+            label.style["width"] = this.styleText["text-width"] + "px"
+            label.style["max-width"] = (this.styleText["text-width"] || maxLableWidth) + "px"
+            label.style["vertical-align"] = "middle"
+            label.style["overflow"] = "hidden"
+            label.style["text-overflow"] = "ellipsis"
+            label.style["white-space"] = "nowrap"
+          }
+        })
+        const items = document.querySelectorAll(`.multiple_select_popper_${this.order} .el-select-dropdown__item:not(:first-child)`)
+        items.forEach(item => {
+          item.style.display = this.isInline ? "inline-block" : "block"
         })
       }
     }
@@ -109,20 +128,7 @@ export default {
 </script>
 
 <style scoped>
-.multiple_select_checkbox >>> .el-select-dropdown .el-checkbox.el-tooltip .el-checkbox__label {
-  width: var(--text-width);
-  max-width: var(--text-max-width);
-  vertical-align: middle;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.multiple_select_checkbox.inline >>> .el-select-dropdown__item:not(:first-child) {
-  display: inline-block;
-}
-
-.multiple_select_checkbox.inline >>> .el-select-dropdown__item.selected::after {
+[class*="multiple_select_popper"].el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after {
   content: "";
 }
 </style>
