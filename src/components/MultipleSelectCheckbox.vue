@@ -1,6 +1,6 @@
 <template>
-  <el-select v-model="selectValues" :popper-class="'multiple_select_popper_' + order" v-bind="$attrs" multiple
-             :class="'multiple_select_checkbox_' + order" :style="styleText" @visible-change="visibleChange" @change="changeSelect">
+  <el-select v-model="selectValues" :popper-class="'multiple_select_popper_' + order" v-bind="$attrs" v-on="$listeners" multiple
+             :class="'multiple_select_checkbox_' + order" @visible-change="visibleChange" @change="changeSelect">
     <el-option v-if="options.length" label="全选" value="全选">
       <el-checkbox v-model="isSelectAll" @click.native.prevent>全选</el-checkbox>
     </el-option>
@@ -45,6 +45,7 @@ export default {
     textWidth: {
       type: Number,
     },
+    // 组件唯一标识 （避免同一个页面引用多次，发生耦合）
     order: {
       type: Number,
       default: 0
@@ -54,11 +55,6 @@ export default {
     return {
       selectValues: [],
       isSelectAll: false,
-      styleText: {
-        "text-width": this.textWidth,
-        "text-max-width": 100,
-        "display": this.isInline ? "block" : "inline-block"
-      },
       multipleSelectCheckboxMaxWidth: 0
     }
   },
@@ -108,9 +104,9 @@ export default {
         labels.forEach((label, index) => {
           // eslint-disable-next-line no-prototype-builtins
           if (!this.options[index].hasOwnProperty("isExceed")) {
-            this.$set(this.options[index], "isExceed", label.scrollWidth > (this.styleText["text-width"] || maxLableWidth))
-            label.style["width"] = this.styleText["text-width"] + "px"
-            label.style["max-width"] = (this.styleText["text-width"] || maxLableWidth) + "px"
+            this.$set(this.options[index], "isExceed", label.scrollWidth - 10 > (this.textWidth || maxLableWidth))
+            label.style["width"] = this.textWidth + "px"
+            label.style["max-width"] = (this.textWidth || maxLableWidth) + "px"
             label.style["vertical-align"] = "middle"
             label.style["overflow"] = "hidden"
             label.style["text-overflow"] = "ellipsis"

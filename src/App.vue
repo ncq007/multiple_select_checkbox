@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div>{{value1}}</div>
-    <MultipleSelectCheckbox v-model="value1" :order="1" placeholder="请选择" collapse-tags :options="options1" style="width: 30%;">
+    <MultipleSelectCheckbox v-model="value1" :order="1" placeholder="请选择" collapse-tags :options="options1" style="width: 30%;" @change="change">
     </MultipleSelectCheckbox>
     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
@@ -68,6 +68,11 @@ export default {
     this.options1 = JSON.parse(JSON.stringify(this.options))
     this.options2 = JSON.parse(JSON.stringify(this.options))
     this.options3 = JSON.parse(JSON.stringify(this.options))
+  },
+  methods: {
+    change() {
+      console.log(this.value1)
+    }
   }
 }
 </script>
