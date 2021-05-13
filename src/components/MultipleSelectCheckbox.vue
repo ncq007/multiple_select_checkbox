@@ -58,13 +58,6 @@ export default {
       multipleSelectCheckboxMaxWidth: 0
     }
   },
-  computed: {
-    isSetInlineBlock() {
-      return {
-        "inline": this.isInline
-      }
-    }
-  },
   mounted() {
     const multipleSelectCheckbox = document.querySelector(`.multiple_select_checkbox_${this.order}.el-select`)
     const elSelectDropdown = document.querySelector(`.multiple_select_popper_${this.order}.el-select-dropdown`)
