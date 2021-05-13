@@ -48,7 +48,7 @@ export default {
   },
   data() {
     return {
-      selectValues: this.value,
+      selectValues: [],
       isSelectAll: false,
       styleText: {
         "--text-width": this.textWidth + "px",
@@ -71,15 +71,17 @@ export default {
   },
   watch: {
     // 监听（全选or全不选）
-    selectValues: {
+    value: {
       handler(arr) {
         this.isSelectAll = arr.length === this.options.length
-        this.$emit("input", arr)
+        this.selectValues = arr
       }
     }
   },
   methods: {
     changeSelect(val) {
+      // eslint-disable-next-line no-debugger
+      debugger
       if (val.includes("全选")) {
         // 说明已经全选了，所以全不选
         if (val.length > this.options.length) {
@@ -90,6 +92,7 @@ export default {
           this.selectValues = this.options.map(item => item[this.props.value])
         }
       }
+      this.$emit("input", this.selectValues)
     },
     // 判断元素是否溢出，溢出加上toolTip
     async visibleChange(visible) {
