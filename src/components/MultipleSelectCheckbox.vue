@@ -1,10 +1,10 @@
 <template>
   <el-select v-model="selectValues" :popper-class="'multiple_select_popper_' + order" v-bind="$attrs" v-on="$listeners" multiple
              :class="'multiple_select_checkbox_' + order" @visible-change="visibleChange" @change="changeSelect">
-    <el-option v-if="options.length" label="全选" value="全选">
+    <el-option v-if="options_.length" label="全选" value="全选">
       <el-checkbox v-model="isSelectAll" @click.native.prevent>全选</el-checkbox>
     </el-option>
-    <el-option v-for="item in options" :key="item[props.value]" :label="item[props.label]" :value="item[props.value]">
+    <el-option v-for="item in options_" :key="item[props.value]" :label="item[props.label]" :value="item[props.value]">
       <el-tooltip :disabled="!item.isExceed" :content="item[props.label]" placement="top" effect="light">
         <el-checkbox :value="selectValues.includes(item[props.value])" @click.native.prevent>{{item[props.label]}}</el-checkbox>
       </el-tooltip>
@@ -53,9 +53,10 @@ export default {
   },
   data() {
     return {
-      selectValues: [],
+      selectValues: this.value,
       isSelectAll: false,
-      multipleSelectCheckboxMaxWidth: 0
+      multipleSelectCheckboxMaxWidth: 0,
+      options_: []
     }
   },
   mounted() {
@@ -69,21 +70,28 @@ export default {
     // 监听（全选or全不选）
     value: {
       handler(arr) {
-        this.isSelectAll = arr.length === this.options.length
         this.selectValues = arr
+        this.isSelectAll = arr.length === this.options_.length
       }
+    },
+    options: {
+      handler(arr) {
+        this.options_ = JSON.parse(JSON.stringify(arr))
+        this.isSelectAll = this.selectValues.length === this.options_.length
+      },
+      immediate: true
     }
   },
   methods: {
     changeSelect(val) {
       if (val.includes("全选")) {
         // 说明已经全选了，所以全不选
-        if (val.length > this.options.length) {
+        if (val.length > this.options_.length) {
           this.selectValues = []
         }
         // 反之，全选
         else {
-          this.selectValues = this.options.map(item => item[this.props.value])
+          this.selectValues = this.options_.map(item => item[this.props.value])
         }
       }
       this.$emit("input", this.selectValues)
@@ -96,8 +104,8 @@ export default {
         const labels = document.querySelectorAll(`.multiple_select_popper_${this.order}.el-select-dropdown .el-checkbox.el-tooltip .el-checkbox__label`)
         labels.forEach((label, index) => {
           // eslint-disable-next-line no-prototype-builtins
-          if (!this.options[index].hasOwnProperty("isExceed")) {
-            this.$set(this.options[index], "isExceed", label.scrollWidth - 10 > (this.textWidth || maxLableWidth))
+          if (!this.options_[index].hasOwnProperty("isExceed")) {
+            this.$set(this.options_[index], "isExceed", label.scrollWidth - 10 > (this.textWidth || maxLableWidth))
             label.style["width"] = this.textWidth + "px"
             label.style["max-width"] = (this.textWidth || maxLableWidth) + "px"
             label.style["vertical-align"] = "middle"
